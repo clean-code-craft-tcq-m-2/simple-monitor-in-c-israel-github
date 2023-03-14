@@ -1,82 +1,68 @@
 #include <stdio.h>
-#include <assert.h>
+#include <string.h>
+#include "checker.h"
+#include "language.h"
 
-#define NUM_OF_PARAMETERS	3
 
-typedef struct batteryParam_s
+void Alerter(batteryParam_t param, float reading)
 {
-	char name[20];
-	float lowThreshold;
-	float hiThreshold;
-} batteryParam_t;
-
-const batteryParam_t batteryParameters[NUM_OF_PARAMETERS] =
-{
-	{"Temperature", 0.0F, 45.0F},
-	{"State of charge", 20.0F, 80.0F},
-	{"Charge rate", 0.0F, 0.8F}
-};
-
-const float testBatteryReadings[8][NUM_OF_PARAMETERS] =
-{
-	{20.0F, 35.0F, 0.6F},
-	{20.0F, 35.0F, 0.85F},
-	{20.0F, 91.0F, 0.6F},
-	{20.0F, 91.0F, 0.85F},
-	{63.0F, 35.0F, 0.6F},
-	{63.0F, 35.0F, 0.85F},
-	{63.0F, 91.0F, 0.6F},
-	{63.0F, 91.0F, 0.85F}
-};
-
-
-void alerter(const batteryParam_t param, const float level)
-{
-	printf("%s is %.1f, out of recommended range of %.1f - %.1f!\n", param.name, level, param.lowThreshold, param.hiThreshold);
+	printf(alertMsgs[language], param.name, reading, param.lowThreshold, param.hiThreshold);
 }
 
-int paramCheck(const batteryParam_t param, const float level)
+void WarningCheck(batteryParam_t param, float reading)
 {
-	if (level < param.lowThreshold || level > param.hiThreshold)
+	float tolerance = param.hiThreshold * 0.05F;
+
+	if ((reading >= param.lowThreshold) && (reading <= (param.lowThreshold + tolerance)))
 	{
-		alerter(param, level);
-		return 1;
+		printf(lowWarningMsgs[language], param.name);
+	}
+	else if ((reading <= param.hiThreshold) && (reading >= (param.hiThreshold - tolerance)))
+	{
+		printf(highWarningMsgs[language], param.name);
 	}
 	else
 	{
-		return 0;
+		// Do nothing, no warning
 	}
 }
 
-int batteryIsOk(const float batteryLevels[]) {
+int ParamIsOk(batteryParam_t param, float reading)
+{
+	if (param.hasWarning != 0)
+	{
+		WarningCheck(param, reading);
+	}
+
+	if (reading < param.lowThreshold || reading > param.hiThreshold)
+	{
+		Alerter(param, reading);
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+int BatteryIsOk(float batteryReadings[])
+{
 	int result = 0;
 	int i = 0;
 
-	for (i = 0; i < NUM_OF_PARAMETERS; i++)
+	for (i = 0; i < PARAM_COUNT; i++)
 	{
-		result += paramCheck(batteryParameters[i], batteryLevels[i]);
+		result += ParamIsOk(batteryParameters[i], batteryReadings[i]);
 	}
 
-	if (result == 0)
+	if (result < PARAM_COUNT)
 	{
-		printf("Battery status is OK\n");
-		return 1;
+		printf(notOKMsgs[language]);
+		return 0;
 	}
 	else
 	{
-		printf("Battery status is NOT OK, please address failures\n");
-		return 0;
+		printf(okMsgs[language]);
+		return 1;
 	}
-}
-
-int main() {
-
-	assert(batteryIsOk(testBatteryReadings[0]));
-
-	for (int i = 1; i < 8; i++)
-	{
-		assert(!batteryIsOk(testBatteryReadings[i]));
-	}
-
-	return 0;
 }
