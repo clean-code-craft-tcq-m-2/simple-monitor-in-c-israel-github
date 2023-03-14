@@ -21,10 +21,6 @@ void WarningCheck(batteryParam_t param, float reading)
 	{
 		printf(highWarningMsgs[language], param.name);
 	}
-	else
-	{
-		// Do nothing, no warning
-	}
 }
 
 int ParamIsOk(batteryParam_t param, float reading)
