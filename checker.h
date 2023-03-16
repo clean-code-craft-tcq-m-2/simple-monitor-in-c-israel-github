@@ -9,6 +9,7 @@ typedef struct batteryParam_s
 extern batteryParam_t batteryParameters[];
 
 void Alerter(batteryParam_t param, float level);
+void PrintStatusMsg(int result);
 void WarningCheck(batteryParam_t param, float level);
 int ParamIsOk(batteryParam_t param, float level);
-int BatteryIsOk(float batteryLevels[]);
+int BatteryCheck(float batteryLevels[]);

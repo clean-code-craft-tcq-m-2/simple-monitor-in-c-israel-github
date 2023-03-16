@@ -1,6 +1,6 @@
 #include "language.h"
 
-const enum languages_e language = GERMAN;
+const enum languages_e language = ENGLISH;
 
 char paramNames[LANGUAGE_COUNT][PARAM_COUNT][20] =
 {
@@ -43,5 +43,3 @@ char notOKMsgs[LANGUAGE_COUNT][70] =
 	[ENGLISH] =	{"Battery status is NOT OK, please address failures\n"},
 	[GERMAN] =	{"Der Batteriestatus ist NICHT OK, bitte beheben Sie Fehler\n"}
 };
-
-

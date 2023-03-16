@@ -36,11 +36,11 @@ int main(void) {
 
 	InitParamNames();
 
-	assert(BatteryIsOk(testBatteryReadings[0]));
+	assert(BatteryCheck(testBatteryReadings[0]) == PARAM_COUNT);
 
 	for (int i = 1; i < 8; i++)
 	{
-		assert(!BatteryIsOk(testBatteryReadings[i]));
+		assert(BatteryCheck(testBatteryReadings[i]) != PARAM_COUNT);
 	}
 
 	return 0;

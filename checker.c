@@ -25,11 +25,6 @@ void WarningCheck(batteryParam_t param, float reading)
 
 int ParamIsOk(batteryParam_t param, float reading)
 {
-	if (param.hasWarning != 0)
-	{
-		WarningCheck(param, reading);
-	}
-
 	if (reading < param.lowThreshold || reading > param.hiThreshold)
 	{
 		Alerter(param, reading);
@@ -41,24 +36,33 @@ int ParamIsOk(batteryParam_t param, float reading)
 	}
 }
 
-int BatteryIsOk(float batteryReadings[])
+void PrintStatusMsg(int result)
+{
+	if (result < PARAM_COUNT)
+	{
+		printf(notOKMsgs[language]);
+	}
+	else
+	{
+		printf(okMsgs[language]);
+	}
+}
+
+int BatteryCheck(float batteryReadings[])
 {
 	int result = 0;
 	int i = 0;
 
 	for (i = 0; i < PARAM_COUNT; i++)
 	{
+		if (batteryParameters[i].hasWarning != 0)
+		{
+			WarningCheck(batteryParameters[i], batteryReadings[i]);
+		}
+
 		result += ParamIsOk(batteryParameters[i], batteryReadings[i]);
 	}
 
-	if (result < PARAM_COUNT)
-	{
-		printf(notOKMsgs[language]);
-		return 0;
-	}
-	else
-	{
-		printf(okMsgs[language]);
-		return 1;
-	}
+	PrintStatusMsg(result);
+	return result;
 }
