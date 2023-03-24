@@ -9,17 +9,38 @@ void Alerter(batteryParam_t param, float reading)
 	printf(alertMsgs[language], param.name, reading, param.lowThreshold, param.hiThreshold);
 }
 
+int IsWithinLimits(float reading, float lowLimit, float hiLimit)
+{
+	if ((reading >= lowLimit) && (reading <= hiLimit))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+void PrintWarningMsg(batteryParam_t param, float reading, float tolerance)
+{
+	if (reading < param.lowThreshold + tolerance)
+	{
+		printf(lowWarningMsgs[language], param.name);
+	}
+	else
+	{
+		printf(highWarningMsgs[language], param.name);
+	}
+}
+
 void WarningCheck(batteryParam_t param, float reading)
 {
 	float tolerance = param.hiThreshold * 0.05F;
 
-	if ((reading >= param.lowThreshold) && (reading <= (param.lowThreshold + tolerance)))
+	if ((IsWithinLimits(reading, param.lowThreshold, param.lowThreshold + tolerance)) ||
+		(IsWithinLimits(reading, param.hiThreshold - tolerance, param.hiThreshold)))
 	{
-		printf(lowWarningMsgs[language], param.name);
-	}
-	else if ((reading <= param.hiThreshold) && (reading >= (param.hiThreshold - tolerance)))
-	{
-		printf(highWarningMsgs[language], param.name);
+		PrintWarningMsg(param, reading, tolerance);
 	}
 }
 
